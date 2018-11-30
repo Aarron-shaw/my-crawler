@@ -25,7 +25,7 @@ def make_room(entrance,rng):
 		random_check = random.randint(1,4)
 		if random_check not in exits:
 			exits.append(random_check)
-	
+	print(exits) #debugging purposes
 	#save this space for the make enemy function
 	
 	objects = random.randint(0,5)
