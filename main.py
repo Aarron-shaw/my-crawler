@@ -55,7 +55,7 @@ def give_minion_stats(dict):
 	minion_stats = {}
 	for i in dict:
 		print("{} {}".format(i, dict[i])) #debugging purposes 
-		p = 0 # THIS IS OUR PROBLEM!	
+		p = 0 	
 		while p < dict[i]:
 		 		
 			minion = { "Name": i, "ID": q, "HP": random.randint(25,100)}
