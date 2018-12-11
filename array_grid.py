@@ -143,7 +143,7 @@ def move(direction,x,y):
 			row = pos[1] // (HEIGHT + MARGIN)
 			#== 2 is AI occupied return to our position
 			if grid[row][column] == 2:
-				if DEBUG == 1: print("CONFLICT")
+				if DEBUG == 1: print("CONFLICT",grid[row][column])
 				pos[1] += WIDTH
 				column = pos[0] // (WIDTH + MARGIN)
 				row = pos[1] // (HEIGHT + MARGIN)
@@ -222,7 +222,7 @@ def move(direction,x,y):
 
 def attack(x,y,player,direction):
 	global grid
-	print("Attacking grids")
+	if DEBUG == 1: print(x,y,player,direction)
 	column = x // (WIDTH + MARGIN)
 	row = y // (HEIGHT + MARGIN)
 	cords = []
@@ -230,28 +230,65 @@ def attack(x,y,player,direction):
 	#4,5,6
 	#7,8,9
 	if direction == "up":
-		row -= 1
-		for i in range(3):
-			try:
-				grid[row][column+(i-1)] = 3
-			except:
+		if row > 0:
+			row -= 1
+			for i in range(3):
+				try:
+					if column+(i-1) >= 0:
+						grid[row][column+(i-1)] = 3
+				except:
+					print("Error",row,column)
 				if DEBUG == 1: print(row,i)
+		else:
+			if DEBUG == 1: print("Can't attack",x,y,player,direction)
+			
+			
 	if direction == "down":
-		row += 1
-		for i in range(3):
-			grid[row][column+(i-1)] = 3
-			if DEBUG == 1: print(row,i)
+		if DEBUG == 1: print("ARGS:",x,y,player,direction)
+		if row <= LIMIT_DR:
+		
+			row += 1
+			for i in range(3):
+				try:
+					if column+(i-1) >= 0:
+						grid[row][column+(i-1)] = 3
+					if DEBUG == 1: print(row,column+(i-1))
+				except:
+					print("Error",row,column)		
+		else:
+			if DEBUG == 1: print("Can't attack",x,y,player,direction)
+			
+			
 	if direction == "left":
-		column -= 1
-		for i in range(3):
-			grid[row+(i-1)][column] = 3
-			if DEBUG == 1: print(row,i)
+		if DEBUG == 1: print("ARGS:",x,y,player,direction)
+		if column >= LIMIT_UL:
+		
+			column -= 1
+			for i in range(3):
+				try:
+					if row+(i-1) >= 0:
+						grid[row+(i-1)][column] = 3
+					if DEBUG == 1: print(row+(i-1),column)
+				except:
+					print("Error",row,column)
+		else:
+			if DEBUG == 1: print("Can't attack",x,y,player,direction)
+			
+			
 	if direction == "right":
-		column += 1
-		for i in range(3):
-			grid[row+(i-1)][column] = 3
-			if DEBUG == 1: print(row,i)
-
+		if DEBUG == 1: print("ARGS:",x,y,player,direction)
+		if column <= LIMIT_DR:
+		
+			column += 1
+			for i in range(3):
+				try:
+					if row+(i-1) >= 0:
+						grid[row+(i-1)][column] = 3
+					if DEBUG == 1: print(row+(i-1),column)
+				except:
+					print("Error",row,column)
+		else:
+			if DEBUG == 1: print("Can't attack",x,y,player,direction)
 	return FPS * 0.3
 
 # -------- Main Program Loop -----------
@@ -283,7 +320,7 @@ while not done:
 			done = True# Flag that we are done so we exit this loop
 		if pressed[pygame.K_SPACE]:
 			timer = attack(pos[0],pos[1],"human",direction)
-	#if DEBUG == 1: print(new_square)
+	if DEBUG == 2: print(new_square)
 	new_square = pick_square_ai(new_square[0],new_square[1])
 	ai_column = new_square[0] // (WIDTH + MARGIN)
 	ai_row = new_square[1] // (HEIGHT + MARGIN)
@@ -307,7 +344,7 @@ while not done:
 	# Set the screen background
 	screen.fill(BLACK)
 	if DEBUG == 2: print(timer)
-	if DEBUG == 2: print(grid) #THIS LINE CAUSES INDENT ERROR
+	if DEBUG == 2: print(grid)
 	# Draw the grid
 	for row in range(MATRIX):
 		for column in range(MATRIX):
@@ -328,8 +365,8 @@ while not done:
 			#pygame.time.wait(30)
 			pygame.draw.rect(screen,color,[(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row + MARGIN, WIDTH,HEIGHT])
 
-	#flash = True
-	# Limit to 60 frames per second
+
+	# Limit to FPS var
 	clock.tick(FPS)
 
 
