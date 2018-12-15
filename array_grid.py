@@ -17,13 +17,19 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
+# GRID DEFS
+# 0 = empty
+# 1 = player
+# 2 = ai
+# 3 = animation
+
 #DEBUGGING SETTING #0 is off, 1 is low, 2 is high
-DEBUG = 1
+DEBUG = 3
 
 # Set the HEIGHT and WIDTH of the screen
 win = pygame.display.Info()
 WINDOW_SIZE = [500,500]
-if DEBUG == 1: print(WINDOW_SIZE)
+if DEBUG > 1 and DEBUG < 2: print(WINDOW_SIZE)
 #This sets the max borders for the moving pieces
 LIMIT_DR = WINDOW_SIZE[0] #down right
 LIMIT_UL = 0 #up left
@@ -79,6 +85,37 @@ clock = pygame.time.Clock()
 def myround(x, base=WIDTH):
 	return int(base * round(float(x)/base))
 
+def xy2grid(x,y):
+	row = x // ((WIDTH + MARGIN))
+	col = y // ((WIDTH + MARGIN))
+	return row,col
+
+def x2grid(x):
+	row = x // ((WIDTH + MARGIN))
+	return row
+
+class ai_pos(object):
+	def __init__(self,x,y,l_x,l_y):
+		self.x = x
+		self.y = y
+		self.l_x = l_x
+		self.l_y = l_y
+		self.row = self.x // ((WIDTH + MARGIN))
+		self.col = self.y // ((WIDTH + MARGIN))
+		self.l_row = self.l_x // ((WIDTH + MARGIN))
+		self.l_col = self.l_y // ((WIDTH + MARGIN))
+	
+	def update_ai(self,new_x,new_y):
+		self.l_x = self.x
+		self.l_y = self.y
+		self.x = new_x
+		self.y = new_y
+		self.row = self.x // ((WIDTH + MARGIN))
+		self.col = self.y // ((WIDTH + MARGIN))
+		self.l_row = self.l_x // ((WIDTH + MARGIN))
+		self.l_col = self.l_y // ((WIDTH + MARGIN))		
+
+	
 #AI functions
 #Pick a new square based on current x,y cords
 #It will either move one square up,down,left,right or stay in the same place
@@ -118,11 +155,11 @@ def pick_square_ai(x,y):
 	return x,y
 
 #set a random square for our ai in x,y form
+
 ai_square_x = random.randint(LIMIT_UL,LIMIT_DR)
 ai_square_y = random.randint(LIMIT_UL,LIMIT_DR)
-new_square = (ai_square_x,ai_square_y)
-last_ai_col = new_square[0] // (WIDTH + MARGIN)
-last_ai_row = new_square[1] // (HEIGHT + MARGIN)
+c_ai_pos = ai_pos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
+
 
 
 #function for moving
@@ -143,7 +180,7 @@ def move(direction,x,y):
 			row = pos[1] // (HEIGHT + MARGIN)
 			#== 2 is AI occupied return to our position
 			if grid[row][column] == 2:
-				if DEBUG == 1: print("CONFLICT",grid[row][column])
+				if DEBUG > 1 and DEBUG < 2: print("CONFLICT",grid[row][column])
 				pos[1] += WIDTH
 				column = pos[0] // (WIDTH + MARGIN)
 				row = pos[1] // (HEIGHT + MARGIN)
@@ -165,7 +202,7 @@ def move(direction,x,y):
 			column = pos[0] // (WIDTH + MARGIN)
 			row = pos[1] // (HEIGHT + MARGIN)
 			if grid[row][column] == 2:
-				if DEBUG == 1: print("CONFLICT")
+				if DEBUG > 1 and DEBUG < 2: print("CONFLICT")
 				pos[1] -= WIDTH
 				column = pos[0] // (WIDTH + MARGIN)
 				row = pos[1] // (HEIGHT + MARGIN)
@@ -184,7 +221,7 @@ def move(direction,x,y):
 			column = pos[0] // (WIDTH + MARGIN)
 			row = pos[1] // (HEIGHT + MARGIN)
 			if grid[row][column] == 2:
-				if DEBUG == 1: print("CONFLICT")
+				if DEBUG > 1 and DEBUG < 2: print("CONFLICT")
 				pos[0] += WIDTH
 				column = pos[0] // (WIDTH + MARGIN)
 				row = pos[1] // (HEIGHT + MARGIN)
@@ -204,7 +241,7 @@ def move(direction,x,y):
 			column = pos[0] // (WIDTH + MARGIN)
 			row = pos[1] // (HEIGHT + MARGIN)
 			if grid[row][column] == 2:
-				if DEBUG == 1: print("CONFLICT")
+				if DEBUG > 1 and DEBUG < 2: print("CONFLICT")
 				pos[0] -= WIDTH
 				column = pos[0] // (WIDTH + MARGIN)
 				row = pos[1] // (HEIGHT + MARGIN)
@@ -216,13 +253,13 @@ def move(direction,x,y):
 		if pos[0] > LIMIT_DR:
 			pos[0] = LIMIT_DR
 
-	#if DEBUG == 1: print(row,column)
+	#if DEBUG > 1 and DEBUG < 2: print(row,column)
 
 #function to perform a forward "attack"
 
 def attack(x,y,player,direction):
 	global grid
-	if DEBUG == 1: print(x,y,player,direction)
+	if DEBUG > 1 and DEBUG < 2: print(x,y,player,direction)
 	column = x // (WIDTH + MARGIN)
 	row = y // (HEIGHT + MARGIN)
 	cords = []
@@ -238,13 +275,13 @@ def attack(x,y,player,direction):
 						grid[row][column+(i-1)] = 3
 				except:
 					print("Error",row,column)
-				if DEBUG == 1: print(row,i)
+				if DEBUG > 1 and DEBUG < 2: print(row,i)
 		else:
-			if DEBUG == 1: print("Can't attack",x,y,player,direction)
+			if DEBUG > 1 and DEBUG < 2: print("Can't attack",x,y,player,direction)
 			
 			
 	if direction == "down":
-		if DEBUG == 1: print("ARGS:",x,y,player,direction)
+		if DEBUG > 1 and DEBUG < 2: print("ARGS:",x,y,player,direction)
 		if row <= LIMIT_DR:
 		
 			row += 1
@@ -252,15 +289,15 @@ def attack(x,y,player,direction):
 				try:
 					if column+(i-1) >= 0:
 						grid[row][column+(i-1)] = 3
-					if DEBUG == 1: print(row,column+(i-1))
+					if DEBUG > 1 and DEBUG < 2: print(row,column+(i-1))
 				except:
 					print("Error",row,column)		
 		else:
-			if DEBUG == 1: print("Can't attack",x,y,player,direction)
+			if DEBUG > 1 and DEBUG < 2: print("Can't attack",x,y,player,direction)
 			
 			
 	if direction == "left":
-		if DEBUG == 1: print("ARGS:",x,y,player,direction)
+		if DEBUG > 1 and DEBUG < 2: print("ARGS:",x,y,player,direction)
 		if column >= LIMIT_UL:
 		
 			column -= 1
@@ -268,15 +305,15 @@ def attack(x,y,player,direction):
 				try:
 					if row+(i-1) >= 0:
 						grid[row+(i-1)][column] = 3
-					if DEBUG == 1: print(row+(i-1),column)
+					if DEBUG > 1 and DEBUG < 2: print(row+(i-1),column)
 				except:
 					print("Error",row,column)
 		else:
-			if DEBUG == 1: print("Can't attack",x,y,player,direction)
+			if DEBUG > 1 and DEBUG < 2: print("Can't attack",x,y,player,direction)
 			
 			
 	if direction == "right":
-		if DEBUG == 1: print("ARGS:",x,y,player,direction)
+		if DEBUG > 1 and DEBUG < 2: print("ARGS:",x,y,player,direction)
 		if column <= LIMIT_DR:
 		
 			column += 1
@@ -284,12 +321,12 @@ def attack(x,y,player,direction):
 				try:
 					if row+(i-1) >= 0:
 						grid[row+(i-1)][column] = 3
-					if DEBUG == 1: print(row+(i-1),column)
+					if DEBUG > 1 and DEBUG < 2: print(row+(i-1),column)
 				except:
 					print("Error",row,column)
 		else:
-			if DEBUG == 1: print("Can't attack",x,y,player,direction)
-	return FPS * 0.3
+			if DEBUG > 1 and DEBUG < 2: print("Can't attack",x,y,player,direction)
+	return FPS * 0.4
 
 # -------- Main Program Loop -----------
 while not done:
@@ -320,19 +357,17 @@ while not done:
 			done = True# Flag that we are done so we exit this loop
 		if pressed[pygame.K_SPACE]:
 			timer = attack(pos[0],pos[1],"human",direction)
-	if DEBUG == 2: print(new_square)
-	new_square = pick_square_ai(new_square[0],new_square[1])
-	ai_column = new_square[0] // (WIDTH + MARGIN)
-	ai_row = new_square[1] // (HEIGHT + MARGIN)
-
-
-	if grid[ai_row][ai_column] == 0:
-		grid[ai_row][ai_column] = 2
-		grid[last_ai_row][last_ai_col] = 0
-		last_ai_row = ai_row
-		last_ai_col = ai_column
-	elif grid[ai_row][ai_column] == 1:
-		grid[last_ai_row][last_ai_col] = 2
+	if DEBUG == 3: print(c_ai_pos.__dict__)
+	tmp_ai = pick_square_ai(c_ai_pos.x,c_ai_pos.y)
+	
+	if grid[x2grid(tmp_ai[0])][x2grid(tmp_ai[1])] == 0:
+		c_ai_pos.update_ai(tmp_ai[0],tmp_ai[1])
+		grid[c_ai_pos.row][c_ai_pos.col] = 2
+		grid[c_ai_pos.l_row][c_ai_pos.l_col] = 0
+	if grid[x2grid(tmp_ai[0])][x2grid(tmp_ai[1])] == 1:
+		print("OCCUPIED!")
+	
+	
 
 	if timer > 0:
 		timer -= 1
@@ -344,7 +379,7 @@ while not done:
 	# Set the screen background
 	screen.fill(BLACK)
 	if DEBUG == 2: print(timer)
-	if DEBUG == 2: print(grid)
+	# if DEBUG == 3: print(grid)
 	# Draw the grid
 	for row in range(MATRIX):
 		for column in range(MATRIX):
@@ -354,15 +389,16 @@ while not done:
 			if grid[row][column] == 2:
 				color = GREEN
 			if grid[row][column] == 3:
-				if timer%4 == 0:
+				if timer%2 == 0:
 					color = RED
 					if DEBUG == 2: print("white")
 				else:
 					color = BLACK
+					print(timer%2)
 					if DEBUG == 2: print("black")
 
 				#color = WHITE
-			#pygame.time.wait(30)
+			#pygame.time.wait(10)
 			pygame.draw.rect(screen,color,[(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row + MARGIN, WIDTH,HEIGHT])
 
 
