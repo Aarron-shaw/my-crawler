@@ -8,8 +8,16 @@ Code based on array_grid.py found @
 
  Explanation video: http://youtu.be/mdTeqiWyFnc
 """
+
+
 import pygame
 import random
+
+
+
+
+
+
 pygame.init()
 # Define some colors
 BLACK = (0, 0, 0)
@@ -41,7 +49,7 @@ LIMIT_UL = 0 #up left
 
 # This sets the margin between each cell
 MARGIN = 0
-MATRIX = 10
+MATRIX = 25
 
 # This sets the WIDTH and HEIGHT of each grid location
 WIDTH = WINDOW_SIZE[0] // MATRIX
@@ -57,18 +65,17 @@ for row in range(MATRIX):
 	grid.append([])
 	for column in range(MATRIX):
 		grid[row].append(0)  # Append a cell
+		
+#Global variables for objects 
+
+enemy_list = ["Goblin","Rats","Giant rat","Snail","zombie","Vampire","Ghost","witch","Org","Orc","Special"]
+
+
 
 #Set a bunch of default values
-#start position
-
-
 
 timer = 0
 direction = "left"
-# Initialize pygame
-# pygame.init()
-
-#screen = pygame.display.set_mode(0, 0)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 
 # Set title of screen
@@ -93,7 +100,15 @@ def xy2grid(x,y):
 def x2grid(x):
 	row = x // ((WIDTH + MARGIN))
 	return row
-
+	
+def chk_blk_ocpy(block_type,x,y):
+	row = x2grid(x) 
+	col = x2grid(y)
+	if not grid[row][col] == 0:
+		return True
+	else:
+		return False
+		
 #Classes
 class ObjProjectile(object):
 	def __init__(self,x,y,direction):
@@ -102,6 +117,7 @@ class ObjProjectile(object):
 		self.row = self.x // ((WIDTH + MARGIN))
 		self.col = self.y // ((WIDTH + MARGIN))
 		self.direction = direction
+
 	
 	def check_collision(self,x,y,direction):
 	#check for collision boarder.
@@ -148,6 +164,7 @@ class ObjHuman(object):
 		self.l_row = self.l_x // ((WIDTH + MARGIN))
 		self.l_col = self.l_y // ((WIDTH + MARGIN))
 		self.direction = direction
+		self.hp = 100
 
 	def move(self,direction,x,y):
 
@@ -251,6 +268,13 @@ class ObjPos(object):
 		self.col = self.y // ((WIDTH + MARGIN))
 		self.l_row = self.l_x // ((WIDTH + MARGIN))
 		self.l_col = self.l_y // ((WIDTH + MARGIN))
+		self.type = enemy_list[random.randint(0,8)]
+		self.id = 1
+		self.hp = 100
+		self.level = 1
+		self.attack = random.randint(1,10)
+		self.defense = random.randint(1,10)
+		
 
 	def update_ai(self,new_x,new_y):
 		self.l_x = self.x
@@ -354,10 +378,15 @@ while not done:
 	if grid[x2grid(tmp_ai[0])][x2grid(tmp_ai[1])] == 1:
 		print("OCCUPIED!")
 
-
+	#Set up debug window strings
+	
+	#Player directions
 	font = pygame.font.SysFont("comicsansms", 22)
-	string_to_print = c_h_pos.direction + "\n" +  str(c_h_pos.l_row) + ":" + str(c_h_pos.l_col)
-	text = font.render(string_to_print, True, (255, 255, 255))
+	string_to_print = c_h_pos.direction + "," + str(c_h_pos.l_row) + ":" + str(c_h_pos.l_col)
+	h_text = font.render(string_to_print, True, (255, 255, 255))
+	#AI INFO
+	ai_string = "Type " + ": " + c_ai_pos.type + ", HP : " + str(c_ai_pos.hp)
+	ai_text = font.render(ai_string, True, (255, 255, 255))
 
 
 
@@ -387,7 +416,8 @@ while not done:
 				#color = WHITE
 			#pygame.time.wait(10)
 			pygame.draw.rect(screen,color,[(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row + MARGIN, WIDTH,HEIGHT])
-	screen.blit(text,(50 - text.get_width() // 2, 510 - text.get_height() // 2))
+	screen.blit(h_text,(0, 510 - h_text.get_height() // 2))
+	screen.blit(ai_text,( 0, 530 - ai_text.get_height() // 2))
 
 	# Limit to FPS var
 	clock.tick(FPS)

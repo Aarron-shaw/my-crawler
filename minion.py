@@ -25,13 +25,5 @@ def make_minion(q):
 	return first
 
 	
-q = 1
-i = 0
-minion = list()
-while i < len(enemy_list):
-	minion.append(make_minion(q))
-	q += 1
-	i += 1
-	
-print(minion)
+
 		
