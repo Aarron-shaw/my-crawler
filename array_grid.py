@@ -25,6 +25,8 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 PASTLE_BLUE = (6, 103, 132)
+GREY = (128,128,128)
+PINK = (255,105,180)
 #Load some fonts
 
 # GRID DEFS
@@ -33,6 +35,8 @@ PASTLE_BLUE = (6, 103, 132)
 # 2 = ai
 # 3 = animation
 # 4 = item
+# 5 = door
+
 #DEBUGGING SETTING #0 is off, 1 is low, 2 is high
 DEBUG = 2
 
@@ -70,7 +74,7 @@ for row in range(MATRIX):
 
 enemy_list = ["Goblin","Rats","Giant rat","Snail","zombie","Vampire","Ghost","witch","Org","Orc","Special"]
 
-
+object_list = ["Gold","Silver","Trash","wood","Iron","Leather","cloth","Potion","Meal","Water","Special"]
 
 #Set a bunch of default values
 
@@ -110,6 +114,18 @@ def chk_blk_ocpy(block_type,x,y):
 		return False
 		
 #Classes
+
+class Item(object):
+	def __init__(self,x,y):
+		self.x = x
+		self.y = y
+		self.row = self.x // ((WIDTH + MARGIN))
+		self.col = self.y // ((WIDTH + MARGIN))
+		self.name = object_list[random.randint(0,10)]
+		self.amount = random.randint(1,4)
+		
+		
+	
 class ObjProjectile(object):
 	def __init__(self,x,y,direction):
 		self.x = x
@@ -178,7 +194,11 @@ class ObjHuman(object):
 				self.row = self.x // (HEIGHT + MARGIN)
 				#== 2 is AI occupied return to our position
 				if not grid[self.row][self.col] == 0:
-					if DEBUG > 1 and DEBUG < 2: print("CONFLICT",grid[self.row][self.col])
+					if DEBUG > 1 and DEBUG < 3: 
+						print("CONFLICT",grid[self.row][self.col])
+					if grid[self.row][self.col] == 5:
+						clean_map()
+						gen_map(1)
 					self.x += WIDTH
 					self.col = self.y // (WIDTH + MARGIN)
 					self.row = self.x // (HEIGHT + MARGIN)
@@ -201,7 +221,10 @@ class ObjHuman(object):
 				self.col = self.y // (WIDTH + MARGIN)
 				self.row = self.x // (HEIGHT + MARGIN)
 				if not grid[self.row][self.col] == 0:
-					if DEBUG > 1 and DEBUG < 2: print("CONFLICT")
+					if DEBUG > 1 and DEBUG < 3: print("CONFLICT")
+					if grid[self.row][self.col] == 5:
+						clean_map()
+						gen_map(1)					
 					self.x -= WIDTH
 					self.col = self.y // (WIDTH + MARGIN)
 					self.row = self.x // (HEIGHT + MARGIN)
@@ -221,7 +244,10 @@ class ObjHuman(object):
 				self.col = self.y // (WIDTH + MARGIN)
 				self.row = self.x // (HEIGHT + MARGIN)
 				if not grid[self.row][self.col] == 0:
-					if DEBUG > 1 and DEBUG < 2: print("CONFLICT")
+					if DEBUG > 1 and DEBUG < 3: print("CONFLICT")
+					if grid[self.row][self.col] == 5:
+						clean_map()
+						gen_map(1)
 					self.y += WIDTH
 					self.col = self.y // (WIDTH + MARGIN)
 					self.row = self.x // (HEIGHT + MARGIN)
@@ -243,7 +269,10 @@ class ObjHuman(object):
 				self.col = self.y // (WIDTH + MARGIN)
 				self.row = self.x // (HEIGHT + MARGIN)
 				if not grid[self.row][self.col] == 0:
-					if DEBUG > 1 and DEBUG < 2: print("CONFLICT")
+					if DEBUG > 1 and DEBUG < 3: print("CONFLICT")
+					if grid[self.row][self.col] == 5:
+						clean_map()
+						gen_map(1)
 					self.y -= WIDTH
 					self.col = self.y // (WIDTH + MARGIN)
 					self.row = self.x // (HEIGHT + MARGIN)
@@ -287,13 +316,88 @@ class ObjPos(object):
 		self.l_col = self.l_y // ((WIDTH + MARGIN))
 
 
+	
 
+
+
+
+def entrance_to_exit(int):
+	if int <= 2:
+		int = int + 2
+	else:
+		int = int - 2
+	return int
+	
+	
+def clean_map():
+	global c_ai_pos
+	for row in range(MATRIX):
+		for column in range(MATRIX):
+			if not grid[row][column] == 1:
+				grid[row][column] = 0
+	del c_ai_pos
+	ai_square_x = random.randint(LIMIT_UL,LIMIT_DR)
+	ai_square_y = random.randint(LIMIT_UL,LIMIT_DR)
+	c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
+	 
+
+def gen_map(entrance):
+	#first step is to generate doors at the edge of the map
+	#Creates a set of exits for the room
+	exits = [entrance_to_exit(entrance)]
+	for i in range(1,random.randint(1,4)):
+		random_check = random.randint(1,4)
+		if random_check not in exits:
+			exits.append(random_check)
+	for q in exits:
+		if q == 1:
+			door_one = random.randint(0,MATRIX-1)
+			
+			grid[0][door_one] = 5
+		if q == 2:
+			door_one = random.randint(0,MATRIX-1)
+			
+			grid[door_one][MATRIX-1] = 5	
+		if q == 3:
+			door_one = random.randint(0,MATRIX-1)
+			
+			grid[MATRIX-1][door_one] = 5
+		if q == 4:
+			door_one = random.randint(0,MATRIX-1)
+			
+			grid[door_one][0] = 5
+	p = 0
+	item = []
+	for row in range(MATRIX):
+		for column in range(MATRIX):
+			x = row * (WIDTH - MARGIN)
+			y = column * (WIDTH - MARGIN)
+			seed = random.randint(1,(MATRIX * MATRIX))
+			if seed < (MATRIX * MATRIX) * 0.01:
+				print(str(seed), str((MATRIX * MATRIX) * 0.01))
+				if not grid[row][column] == 0:
+					#can't place here as door is here
+					try:
+						if grid[row-1][column-1] == 0:
+							item[p] = Item(x,y)
+							grid[row-1][column-1] = 4
+					except:
+						print("Error")
+				else:
+					grid[row][column] = 4
+					item.append(Item(x,y))
+					
+						
+						
 #AI functions
-#Pick a new square based on current x,y cords
-#It will either move one square up,down,left,right or stay in the same place
-
 def pick_square_ai(x,y):
+
+	#Pick a new square based on current x,y cords
+	#It will either move one square up,down,left,right or stay in the same place
 	seed = random.randint(0,4)
+	target_x = c_h_pos.x
+	target_y = c_h_pos.y
+	
 	if seed == 0:
 		x -= WIDTH
 
@@ -336,7 +440,7 @@ c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
 c_h_pos = ObjHuman(0,0,0,0,"left")
 grid[c_h_pos.row][c_h_pos.col] = 1
 
-
+gen_map(1)
 
 # -------- Main Program Loop -----------
 while not done:
@@ -412,6 +516,10 @@ while not done:
 					if DEBUG == 2: print("black")
 				if timer == 0:
 					grid[row][column] = 0
+			if grid[row][column] == 4:
+				color = PINK
+			if grid[row][column] == 5:
+				color = GREY
 
 				#color = WHITE
 			#pygame.time.wait(10)

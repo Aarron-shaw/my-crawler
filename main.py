@@ -1,13 +1,7 @@
 #!/usr/bin/env python3 
 import time
 import random
-def make_wait():
-	for x in range (0,5):  
-		b = "Loading" + "." * x
-		print (b, end="\r")
-		time.sleep(0.5)
-def clear_wait():
-	print("\r						\r")
+					\r")
 
 def entrance_to_exit(int):
 	if int <= 2:
@@ -50,21 +44,17 @@ def make_minions(rng):
 	print(give_minion_stats(enmy_aval))
 	
 
-def give_minion_stats(dict):
-	q = 1;
-	minion_stats = {}
-	for i in dict:
-		print("{} {}".format(i, dict[i])) #debugging purposes 
-		p = 0 	
-		while p < dict[i]:
-		 		
-			minion = { "Name": i, "ID": q, "HP": random.randint(25,100)}
-			#minion_stats[q] = {}
-			minion_stats[q] = minion
-			p += 1
-			q += 1
+class minion_stats(object):
+	def __init__(self,name,id,hp,level,attack,defense):
+		self.name = name
+		self.id = id
+		self.hp = hp
+		self.level = level
+		self.attack = attack
+		self.defense = defense
+		
 	
-	return minion_stats
+	
 #make_wait()
 #clear_wait()
 print(make_room(1,3))
