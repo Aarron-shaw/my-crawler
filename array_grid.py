@@ -547,13 +547,13 @@ def pick_square_ai(x,y):
 		x = LIMIT_UL + WIDTH
 
 	if x > (LIMIT_DR - WIDTH):
-		x -= WIDTH
+		x -= LIMIT_DR - WIDTH
 
 	if y < LIMIT_UL:
 		y = LIMIT_UL + WIDTH
 
 	if y > (LIMIT_DR - WIDTH):
-		y -= WIDTH
+		y -= LIMIT_DR - WIDTH
 
 
 	return x,y
@@ -602,7 +602,8 @@ while not done:
 	if DEBUG == 3: print(c_ai_pos.__dict__)
 	
 	tmp_ai = pick_square_ai(c_ai_pos.x,c_ai_pos.y)
-
+	print("grid : ", str(x2grid(tmp_ai[0])), " ", str(x2grid(tmp_ai[1])))
+	print(tmp_ai)
 	if grid[x2grid(tmp_ai[0])][x2grid(tmp_ai[1])] == 0:
 		c_ai_pos.update_ai(tmp_ai[0],tmp_ai[1])
 		grid[c_ai_pos.row][c_ai_pos.col] = 2
