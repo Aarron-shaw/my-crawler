@@ -27,7 +27,7 @@ RED = (255, 0, 0)
 PASTLE_BLUE = (6, 103, 132)
 GREY = (128,128,128)
 PINK = (255,105,180)
-#Load some fonts
+
 
 # GRID DEFS
 # 0 = empty
@@ -41,7 +41,7 @@ PINK = (255,105,180)
 DEBUG = 2
 
 # Set the HEIGHT and WIDTH of the screen
-win = pygame.display.Info()
+
 WINDOW_SIZE = [500,700]
 if DEBUG > 1 and DEBUG < 2: print(WINDOW_SIZE)
 #This sets the max borders for the moving pieces
@@ -112,6 +112,31 @@ def chk_blk_ocpy(block_type,x,y):
 		return True
 	else:
 		return False
+		
+def chk_side(x,y):
+	row = x2grid(x)
+	col = x2grid(y)
+	if row <= 1 and col <= MATRIX:
+		return 1
+	if row >= 2 and col >= MATRIX-1:
+		return 2
+	if row >= MATRIX-1 and col >= 0:
+		return 3
+	if row <= MATRIX and col <= 1:
+		return 4
+
+def chk_row(q,x,y):
+	row = x2grid(x)
+	col = x2grid(y)
+	if q == 1:
+		return col
+	if q == 2: 
+		return row
+	if q == 3: 
+		return col
+	if q == 4:
+		return row
+	
 		
 #Classes
 
@@ -184,7 +209,7 @@ class ObjHuman(object):
 
 	def move(self,direction,x,y):
 
-
+		q = 1
 		if direction == "up":
 			#if our height is greater than the limit we can move
 			#defailt is 0
@@ -197,11 +222,34 @@ class ObjHuman(object):
 					if DEBUG > 1 and DEBUG < 3: 
 						print("CONFLICT",grid[self.row][self.col])
 					if grid[self.row][self.col] == 5:
+						q = chk_side(self.x,self.y)
 						clean_map()
-						gen_map(1)
-					self.x += WIDTH
-					self.col = self.y // (WIDTH + MARGIN)
-					self.row = self.x // (HEIGHT + MARGIN)
+						sq = chk_row(q,self.x,self.y)
+						gen_map(q,sq)
+						if q == 1:
+							self.x = LIMIT_DR - (WIDTH * 2)
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+						if q == 2:
+							self.y = LIMIT_UL + WIDTH
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)		
+						if q == 3:
+							self.x = LIMIT_UL + WIDTH
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+						if q == 4:
+							self.y = LIMIT_DR - (WIDTH * 2)
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)							
+					else:
+						self.x += WIDTH
+						self.col = self.y // (WIDTH + MARGIN)
+						self.row = self.x // (HEIGHT + MARGIN)
 				#0 is free, so we can occupy it.
 				if grid[self.row][self.col] == 0:
 					grid[self.row][self.col] = 1
@@ -223,11 +271,34 @@ class ObjHuman(object):
 				if not grid[self.row][self.col] == 0:
 					if DEBUG > 1 and DEBUG < 3: print("CONFLICT")
 					if grid[self.row][self.col] == 5:
+						q = chk_side(self.x,self.y)
 						clean_map()
-						gen_map(1)					
-					self.x -= WIDTH
-					self.col = self.y // (WIDTH + MARGIN)
-					self.row = self.x // (HEIGHT + MARGIN)
+						sq = chk_row(q,self.x,self.y)
+						gen_map(q,sq)
+						if q == 1:
+							self.x = LIMIT_DR - (WIDTH * 2)
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+						if q == 2:
+							self.y = LIMIT_UL + WIDTH
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)		
+						if q == 3:
+							self.x = LIMIT_UL + WIDTH
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+						if q == 4:
+							self.y = LIMIT_DR - (WIDTH * 2)
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)						
+					else:
+						self.x -= WIDTH
+						self.col = self.y // (WIDTH + MARGIN)
+						self.row = self.x // (HEIGHT + MARGIN)
 				if grid[self.row][self.col] == 0:
 					grid[self.row][self.col] = 1
 					grid[self.l_row][self.l_col] = 0
@@ -246,11 +317,34 @@ class ObjHuman(object):
 				if not grid[self.row][self.col] == 0:
 					if DEBUG > 1 and DEBUG < 3: print("CONFLICT")
 					if grid[self.row][self.col] == 5:
+						q = chk_side(self.x,self.y)
 						clean_map()
-						gen_map(1)
-					self.y += WIDTH
-					self.col = self.y // (WIDTH + MARGIN)
-					self.row = self.x // (HEIGHT + MARGIN)
+						sq = chk_row(q,self.x,self.y)
+						gen_map(q,sq)
+						if q == 1:
+							self.x = LIMIT_DR - (WIDTH * 2)
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+						if q == 2:
+							self.y = LIMIT_UL + WIDTH
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)		
+						if q == 3:
+							self.x = LIMIT_UL + WIDTH
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+						if q == 4:
+							self.y = LIMIT_DR - (WIDTH * 2)
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+					else:
+						self.y += WIDTH
+						self.col = self.y // (WIDTH + MARGIN)
+						self.row = self.x // (HEIGHT + MARGIN)
 				if grid[self.row][self.col] == 0:
 					grid[self.row][self.col] = 1
 					grid[self.l_row][self.l_col] = 0
@@ -271,11 +365,34 @@ class ObjHuman(object):
 				if not grid[self.row][self.col] == 0:
 					if DEBUG > 1 and DEBUG < 3: print("CONFLICT")
 					if grid[self.row][self.col] == 5:
+						q = chk_side(self.x,self.y)
 						clean_map()
-						gen_map(1)
-					self.y -= WIDTH
-					self.col = self.y // (WIDTH + MARGIN)
-					self.row = self.x // (HEIGHT + MARGIN)
+						sq = chk_row(q,self.x,self.y)
+						gen_map(q,sq)
+						if q == 1:
+							self.x = LIMIT_DR - (WIDTH * 2)
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+						if q == 2:
+							self.y = LIMIT_UL + WIDTH
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)		
+						if q == 3:
+							self.x = LIMIT_UL + WIDTH
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+						if q == 4:
+							self.y = LIMIT_DR - (WIDTH * 2)
+							self.col = self.y // (WIDTH + MARGIN)
+							self.row = self.x // (HEIGHT + MARGIN)
+							print(self.x,self.y,self.row,self.col)
+					else:
+						self.y -= WIDTH
+						self.col = self.y // (WIDTH + MARGIN)
+						self.row = self.x // (HEIGHT + MARGIN)
 				if grid[self.row][self.col] == 0:
 					grid[self.row][self.col] = 1
 					grid[self.l_row][self.l_col] = 0
@@ -319,8 +436,9 @@ class ObjPos(object):
 	
 
 
+#Map functions 
 
-
+#This function sets an int either +2 or -2 to "swap sides of the map"
 def entrance_to_exit(int):
 	if int <= 2:
 		int = int + 2
@@ -328,7 +446,7 @@ def entrance_to_exit(int):
 		int = int - 2
 	return int
 	
-	
+	#Set all of our none player grids to 0 to clean it and initialise a new AI.
 def clean_map():
 	global c_ai_pos
 	for row in range(MATRIX):
@@ -341,7 +459,7 @@ def clean_map():
 	c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
 	 
 
-def gen_map(entrance):
+def gen_map(entrance,square):
 	#first step is to generate doors at the edge of the map
 	#Creates a set of exits for the room
 	exits = [entrance_to_exit(entrance)]
@@ -351,22 +469,32 @@ def gen_map(entrance):
 			exits.append(random_check)
 	for q in exits:
 		if q == 1:
-			door_one = random.randint(0,MATRIX-1)
+			if q == exits[0]:
+				door_one = square
+			else:
+				door_one = random.randint(0,MATRIX-1)
 			
 			grid[0][door_one] = 5
 		if q == 2:
-			door_one = random.randint(0,MATRIX-1)
-			
+			if q == exits[0]:
+				door_one = square
+			else:
+				door_one = random.randint(0,MATRIX-1)
 			grid[door_one][MATRIX-1] = 5	
 		if q == 3:
-			door_one = random.randint(0,MATRIX-1)
-			
+			if q == exits[0]:
+				door_one = square
+			else:
+				door_one = random.randint(0,MATRIX-1)
 			grid[MATRIX-1][door_one] = 5
 		if q == 4:
-			door_one = random.randint(0,MATRIX-1)
-			
+			if q == exits[0]:
+				door_one = square
+			else:
+				door_one = random.randint(0,MATRIX-1)
 			grid[door_one][0] = 5
 	p = 0
+	#Generate items in the map. 
 	item = []
 	for row in range(MATRIX):
 		for column in range(MATRIX):
@@ -440,7 +568,7 @@ c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
 c_h_pos = ObjHuman(0,0,0,0,"left")
 grid[c_h_pos.row][c_h_pos.col] = 1
 
-gen_map(1)
+gen_map(1,random.randint(0,MATRIX-1))
 
 # -------- Main Program Loop -----------
 while not done:
@@ -467,7 +595,7 @@ while not done:
 		if event.type == pygame.QUIT:  # If user clicked close
 			done = True
 		if pressed[pygame.K_ESCAPE]:
-			done = True# Flag that we are done so we exit this loop
+			done = True	# Flag that we are done so we exit this loop
 		if pressed[pygame.K_SPACE]:
 			proj = ObjProjectile(c_h_pos.x,c_h_pos.y,c_h_pos.direction)
 			proj.check_collision(proj.x,proj.y,proj.direction)
