@@ -151,46 +151,46 @@ class Item(object):
 		
 		
 	
-class ObjProjectile(object):
-	def __init__(self,x,y,direction):
-		self.x = x
-		self.y = y
-		self.row = self.x // ((WIDTH + MARGIN))
-		self.col = self.y // ((WIDTH + MARGIN))
-		self.direction = direction
+# class ObjProjectile(object):
+	# def __init__(self,x,y,direction):
+		# self.x = x
+		# self.y = y
+		# self.row = self.x // ((WIDTH + MARGIN))
+		# self.col = self.y // ((WIDTH + MARGIN))
+		# self.direction = direction
 
 	
-	def check_collision(self,x,y,direction):
-	#check for collision boarder.
-		self.direction = direction
-		if direction == "up":
-			if not (x-WIDTH) <= LIMIT_UL:
-				self.x = (x-WIDTH)
-				self.row = self.x // ((WIDTH + MARGIN))
-				print(self.x,self.y,self.row,self.col,self.direction)
-				grid[self.row][self.col] = 3
-				return FPS * 0.3
-		if direction == "down":
-			if not (self.x+WIDTH) >= LIMIT_DR:
-				self.x = (x+WIDTH)
-				self.row = self.x // ((WIDTH + MARGIN))
-				print(self.x,self.y,self.row,self.col,self.direction,LIMIT_DR)
-				grid[self.row][self.col] = 3
-				return FPS * 0.3
-		if direction == "left":
-			if not (y-WIDTH) <= LIMIT_UL:
-				self.y = (y-WIDTH)
-				self.col = self.y // ((WIDTH + MARGIN))
-				print(self.x,self.y,self.row,self.col,self.direction)
-				grid[self.row][self.col] = 3
-				return FPS * 0.3
-		if direction == "right":
-			if not (y+WIDTH) >= LIMIT_DR:
-				self.y = (y+WIDTH)
-				self.col = self.y // ((WIDTH + MARGIN))
-				print(self.x,self.y,self.row,self.col,self.direction)
-				grid[self.row][self.col] = 3
-				return FPS * 0.3
+	# def check_collision(self,x,y,direction):
+	# #check for collision boarder.
+		# self.direction = direction
+		# if direction == "up":
+			# if not (x-WIDTH) <= LIMIT_UL:
+				# self.x = (x-WIDTH)
+				# self.row = self.x // ((WIDTH + MARGIN))
+				# print(self.x,self.y,self.row,self.col,self.direction)
+				# grid[self.row][self.col] = 3
+				
+		# if direction == "down":
+			# if not (self.x+WIDTH) >= LIMIT_DR:
+				# self.x = (x+WIDTH)
+				# self.row = self.x // ((WIDTH + MARGIN))
+				# print(self.x,self.y,self.row,self.col,self.direction,LIMIT_DR)
+				# grid[self.row][self.col] = 3
+				
+		# if direction == "left":
+			# if not (y-WIDTH) <= LIMIT_UL:
+				# self.y = (y-WIDTH)
+				# self.col = self.y // ((WIDTH + MARGIN))
+				# print(self.x,self.y,self.row,self.col,self.direction)
+				# grid[self.row][self.col] = 3
+				
+		# if direction == "right":
+			# if not (y+WIDTH) >= LIMIT_DR:
+				# self.y = (y+WIDTH)
+				# self.col = self.y // ((WIDTH + MARGIN))
+				# print(self.x,self.y,self.row,self.col,self.direction)
+				# grid[self.row][self.col] = 3
+		# return FPS * 0.3
 		
 		
 
@@ -198,18 +198,32 @@ class ObjHuman(object):
 	def __init__(self,x,y,l_x,l_y,direction):
 		self.x = x
 		self.y = y
+		#last x,y
 		self.l_x = l_x
 		self.l_y = l_y
 		self.row = self.x // ((WIDTH + MARGIN))
 		self.col = self.y // ((WIDTH + MARGIN))
+		#last row/col
 		self.l_row = self.l_x // ((WIDTH + MARGIN))
 		self.l_col = self.l_y // ((WIDTH + MARGIN))
 		self.direction = direction
 		self.hp = 100
+		
+		#projectiles
+		self.p_x = x
+		self.p_y = y
+		self.p_row = self.row
+		self.p_col = self.col
+		self.p_direction = direction
+		
+	def debug_self(self):
+		print("x:{},y:{},p_x:{},p_y:{}".format(self.x,self.y,self.p_x,self.p_y))
 
 	def move(self,direction,x,y):
 
 		q = 1
+		#up,down,left,right are all repeated cases. 
+		#as each case is slightly different. 
 		if direction == "up":
 			#if our height is greater than the limit we can move
 			#defailt is 0
@@ -221,6 +235,10 @@ class ObjHuman(object):
 				if not grid[self.row][self.col] == 0:
 					if DEBUG > 1 and DEBUG < 3: 
 						print("CONFLICT",grid[self.row][self.col])
+					#if the target grid is a door, we clean the map and 
+					#generate a new one and switch sides of our player
+					#based on our original side. 
+					
 					if grid[self.row][self.col] == 5:
 						q = chk_side(self.x,self.y)
 						clean_map()
@@ -245,7 +263,8 @@ class ObjHuman(object):
 							self.y = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)							
+							print(self.x,self.y,self.row,self.col)
+					#We can't occupy the grid, move back. 
 					else:
 						self.x += WIDTH
 						self.col = self.y // (WIDTH + MARGIN)
@@ -403,6 +422,47 @@ class ObjHuman(object):
 			print(self.x,self.y,self.row,self.col)
 			self.direction = "right"
 
+	def check_collision(self,x,y,direction):
+
+	#check for collision boarder.
+		self.direction = direction
+		self.p_x = x 
+		self.p_y = y
+		self.p_row = self.p_x // ((WIDTH + MARGIN))
+		self.p_col = self.p_y // ((WIDTH + MARGIN))
+		
+		if direction == "up":
+			if not (x-WIDTH) <= LIMIT_UL:
+				self.p_x = (x-WIDTH)
+				self.p_row = self.p_x // ((WIDTH + MARGIN))
+				print(self.p_x,self.p_y,self.p_row,self.p_col,self.p_direction)
+				grid[self.p_row][self.p_col] = 3
+				
+		if direction == "down":
+			if not (x+WIDTH) >= LIMIT_DR:
+				self.p_x = (x+WIDTH)
+				self.p_row = self.p_x // ((WIDTH + MARGIN))
+				print(self.p_x,self.p_y,self.p_row,self.p_col,self.p_direction,LIMIT_DR)
+				grid[self.p_row][self.p_col] = 3
+				
+		if direction == "left":
+			if not (y-WIDTH) <= LIMIT_UL:
+				self.p_y = (y-WIDTH)
+				self.p_col = self.p_y // ((WIDTH + MARGIN))
+				print(self.p_x,self.p_y,self.p_row,self.p_col,self.direction)
+				grid[self.p_row][self.p_col] = 3
+				
+		if direction == "right":
+			if not (y+WIDTH) >= LIMIT_DR:
+				self.p_y = (y+WIDTH)
+				self.p_col = self.p_y // ((WIDTH + MARGIN))
+				print(self.p_x,self.p_y,self.p_row,self.p_col,self.direction)
+				grid[self.p_row][self.p_col] = 3
+		if DEBUG == 3: self.debug_self()
+		
+
+		return FPS * 0.3
+
 
 class ObjPos(object):
 	def __init__(self,x,y,l_x,l_y):
@@ -514,7 +574,9 @@ def gen_map(entrance,square):
 				else:
 					grid[row][column] = 4
 					item.append(Item(x,y))
-					
+					print(item[p].__dict__)
+				p += 1
+				
 						
 						
 #AI functions
@@ -545,16 +607,17 @@ def pick_square_ai(x,y):
 	#Don't allow the cords to be higher/lower than the border edges.
 	if x < LIMIT_UL:
 		x = LIMIT_UL + WIDTH
+		# print("Here 1:")
 
 	if x > (LIMIT_DR - WIDTH):
-		x -= LIMIT_DR - WIDTH
-
+		x = LIMIT_DR - WIDTH
+		# print("Here 2:")
 	if y < LIMIT_UL:
 		y = LIMIT_UL + WIDTH
-
+		# print("Here 3:")
 	if y > (LIMIT_DR - WIDTH):
-		y -= LIMIT_DR - WIDTH
-
+		y = LIMIT_DR - WIDTH
+		# print("Here 4:")
 
 	return x,y
 
@@ -597,13 +660,13 @@ while not done:
 		if pressed[pygame.K_ESCAPE]:
 			done = True	# Flag that we are done so we exit this loop
 		if pressed[pygame.K_SPACE]:
-			proj = ObjProjectile(c_h_pos.x,c_h_pos.y,c_h_pos.direction)
-			proj.check_collision(proj.x,proj.y,proj.direction)
+			#proj = ObjProjectile(c_h_pos.x,c_h_pos.y,c_h_pos.direction)
+			c_h_pos.check_collision(c_h_pos.x,c_h_pos.y,c_h_pos.direction)
 	if DEBUG == 3: print(c_ai_pos.__dict__)
 	
 	tmp_ai = pick_square_ai(c_ai_pos.x,c_ai_pos.y)
-	print("grid : ", str(x2grid(tmp_ai[0])), " ", str(x2grid(tmp_ai[1])))
-	print(tmp_ai)
+	#print("grid : ", str(x2grid(tmp_ai[0])), " ", str(x2grid(tmp_ai[1])))
+	#print(tmp_ai)
 	if grid[x2grid(tmp_ai[0])][x2grid(tmp_ai[1])] == 0:
 		c_ai_pos.update_ai(tmp_ai[0],tmp_ai[1])
 		grid[c_ai_pos.row][c_ai_pos.col] = 2
