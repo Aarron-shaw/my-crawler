@@ -28,7 +28,8 @@ PASTLE_BLUE = (6, 103, 132)
 GREY = (128,128,128)
 PINK = (255,105,180)
 
-
+slower = False
+RNG = 0.05
 # GRID DEFS
 # 0 = empty
 # 1 = player
@@ -105,6 +106,7 @@ def x2grid(x):
 	row = x // ((WIDTH + MARGIN))
 	return row
 	
+	#return true if block is 0 or the block is the same as our choice. 
 def chk_blk_ocpy(block_type,x,y):
 	row = x2grid(x) 
 	col = x2grid(y)
@@ -218,7 +220,8 @@ class ObjHuman(object):
 	def debug_self(self):
 		# print("x:{},y:{},p_x:{},p_y:{}".format(self.x,self.y,self.p_x,self.p_y))
 		# print("p_row:{},p_col:{}".format(self.p_row,self.p_col))
-		print(self.p_x,self.p_y)
+		#print(self.p_x,self.p_y)
+		pass
 	def move(self,direction,x,y):
 
 		q = 1
@@ -248,22 +251,22 @@ class ObjHuman(object):
 							self.x = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 						if q == 2:
 							self.y = LIMIT_UL + WIDTH
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)		
+							##print(self.x,self.y,self.row,self.col)		
 						if q == 3:
 							self.x = LIMIT_UL + WIDTH
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 						if q == 4:
 							self.y = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 					#We can't occupy the grid, move back. 
 					else:
 						self.x += (WIDTH + MARGIN)
@@ -279,7 +282,7 @@ class ObjHuman(object):
 			if self.x < LIMIT_UL:
 				self.x = LIMIT_UL
 			self.direction = "up"
-			print(self.x,self.y,self.row,self.col)
+			##print(self.x,self.y,self.row,self.col)
 
 		if direction == "down":
 
@@ -298,22 +301,22 @@ class ObjHuman(object):
 							self.x = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 						if q == 2:
 							self.y = LIMIT_UL + WIDTH
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)		
+							##print(self.x,self.y,self.row,self.col)		
 						if q == 3:
 							self.x = LIMIT_UL + WIDTH
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 						if q == 4:
 							self.y = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)						
+							##print(self.x,self.y,self.row,self.col)						
 					else:
 						self.x -= (WIDTH + MARGIN)
 						self.col = self.y // (WIDTH + MARGIN)
@@ -326,7 +329,7 @@ class ObjHuman(object):
 			if self.y > LIMIT_DR:
 				self.y = LIMIT_DR
 			self.direction = "down"
-			print(self.x,self.y,self.row,self.col)
+			##print(self.x,self.y,self.row,self.col)
 
 		if direction == "left":
 			if self.y > LIMIT_UL:
@@ -344,22 +347,22 @@ class ObjHuman(object):
 							self.x = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 						if q == 2:
 							self.y = LIMIT_UL + WIDTH
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)		
+							##print(self.x,self.y,self.row,self.col)		
 						if q == 3:
 							self.x = LIMIT_UL + WIDTH
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 						if q == 4:
 							self.y = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 					else:
 						self.y += (WIDTH + MARGIN)
 						self.col = self.y // (WIDTH + MARGIN)
@@ -371,7 +374,7 @@ class ObjHuman(object):
 					self.l_col = self.col
 			if self.y > LIMIT_DR:
 				self.y = LIMIT_DR
-			print(self.x,self.y,self.row,self.col)
+			##print(self.x,self.y,self.row,self.col)
 			self.direction = "left"
 
 
@@ -392,22 +395,22 @@ class ObjHuman(object):
 							self.x = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 						if q == 2:
 							self.y = LIMIT_UL + WIDTH
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)		
+							##print(self.x,self.y,self.row,self.col)		
 						if q == 3:
 							self.x = LIMIT_UL + WIDTH
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 						if q == 4:
 							self.y = LIMIT_DR - (WIDTH * 2)
 							self.col = self.y // (WIDTH + MARGIN)
 							self.row = self.x // (HEIGHT + MARGIN)
-							print(self.x,self.y,self.row,self.col)
+							##print(self.x,self.y,self.row,self.col)
 					else:
 						self.y -= (WIDTH + MARGIN)
 						self.col = self.y // (WIDTH + MARGIN)
@@ -419,7 +422,7 @@ class ObjHuman(object):
 					self.l_col = self.col
 			if self.y > LIMIT_DR:
 				self.y = LIMIT_DR
-			print(self.x,self.y,self.row,self.col)
+			##print(self.x,self.y,self.row,self.col)
 			self.direction = "right"
 
 	def check_collision(self,x,y,direction):
@@ -435,28 +438,28 @@ class ObjHuman(object):
 			if not (x-WIDTH) <= LIMIT_UL:
 				self.p_x = (x-WIDTH)
 				self.p_row = self.p_x // ((WIDTH + MARGIN))
-				print(self.p_x,self.p_y,self.p_row,self.p_col,self.p_direction)
+				#print(self.p_x,self.p_y,self.p_row,self.p_col,self.p_direction)
 				grid[self.p_row][self.p_col] = 3
 				
 		if direction == "down":
 			if not (x+WIDTH) >= LIMIT_DR:
 				self.p_x = (x+WIDTH+MARGIN)
 				self.p_row = self.p_x // ((WIDTH + MARGIN))
-				print(self.p_x,self.p_y,self.p_row,self.p_col,self.p_direction,LIMIT_DR)
+				#print(self.p_x,self.p_y,self.p_row,self.p_col,self.p_direction,LIMIT_DR)
 				grid[self.p_row][self.p_col] = 3
 				
 		if direction == "left":
 			if not (y-WIDTH) < LIMIT_UL:
 				self.p_y = (y-WIDTH)
 				self.p_col = self.p_y // ((WIDTH + MARGIN))
-				print(self.p_x,self.p_y,self.p_row,self.p_col,self.direction)
+				#print(self.p_x,self.p_y,self.p_row,self.p_col,self.direction)
 				grid[self.p_row][self.p_col] = 3
 				
 		if direction == "right":
 			if not (y+WIDTH) > LIMIT_DR:
 				self.p_y = (y+WIDTH+MARGIN)
 				self.p_col = self.p_y // ((WIDTH + MARGIN))
-				print(self.p_x,self.p_y,self.p_row,self.p_col,self.direction)
+				#print(self.p_x,self.p_y,self.p_row,self.p_col,self.direction)
 				grid[self.p_row][self.p_col] = 3
 		if DEBUG == 3: self.debug_self()
 		self.debug_self()
@@ -498,6 +501,8 @@ class ObjPos(object):
 		self.y = y
 		self.l_x = l_x
 		self.l_y = l_y
+		self.b_x = 0
+		self.b_y = 0
 		self.row = self.x // ((WIDTH + MARGIN))
 		self.col = self.y // ((WIDTH + MARGIN))
 		self.l_row = self.l_x // ((WIDTH + MARGIN))
@@ -524,35 +529,60 @@ class ObjPos(object):
 		#given the players cords, move on step closer. 
 		t_x = self.x - h_x 
 		t_y = self.y - h_y
-		print(t_x,t_y)
+		failstate = 0
+		#print(t_x,t_y)
+		if self.l_x == self.b_x and self.l_y == self.b_y:
+			print("switching?")
+			seed = random.randint(0,4)
+			
+			mv_x = 0
+			mv_y = 0
+
+			if seed == 0:
+				mv_x -= (WIDTH + MARGIN)
+
+			elif seed == 1:
+				mv_y -= (WIDTH + MARGIN)
+			elif seed == 2:
+				mv_x = 0
+				mv_y = 0
+				self.b_x = self.x
+				self.b_y = self.y
+			elif seed == 3:
+				mv_y += (WIDTH + MARGIN)
+
+			elif seed == 4:
+				mv_x += (WIDTH + MARGIN)
 		
-		if t_x > 0 and t_y >= 0:
-			print("up")
-			mv_x = -WIDTH+MARGIN
-			mv_y = 0
+		else:
 			
-			
-			
-		elif t_x >= 0 and t_y < 0:
-			print("right")
-			mv_x = 0
-			mv_y = WIDTH+MARGIN
-			
-			
-		elif t_x < 0 and t_y <= 0:
-			print("down")
-			mv_x = WIDTH+MARGIN
-			mv_y = 0
-			
-			
-		elif t_x <= 0 and t_y > 0:
-			print("left")
-			mv_x = 0
-			mv_y = -WIDTH+MARGIN
-			
-		elif t_x == 0 and t_y == 0:
-			mv_x = 0
-			mv_y = 0
+			if t_x > 0 and t_y >= 0:
+				print("up")
+				mv_x = -WIDTH+MARGIN
+				mv_y = 0
+				
+				
+				
+			elif t_x >= 0 and t_y < 0:
+				print("right")
+				mv_x = 0
+				mv_y = WIDTH+MARGIN
+				
+				
+			elif t_x < 0 and t_y <= 0:
+				print("down")
+				mv_x = WIDTH+MARGIN
+				mv_y = 0
+				
+				
+			elif t_x <= 0 and t_y > 0:
+				print("left")
+				mv_x = 0
+				mv_y = -WIDTH+MARGIN
+				
+			elif t_x == 0 and t_y == 0:
+				mv_x = 0
+				mv_y = 0
 			
 		#This section checks if the target is at the boarder, 
 		#if returns True, it's ok to proceed. 
@@ -570,36 +600,58 @@ class ObjPos(object):
 					if chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == False:
 						if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
 							break
-				if seed == 1: #try move left
+					else:
+						print("failstate")
+						failstate += 1
+						self.b_x = self.x
+						self.b_y = self.y
+				elif seed == 1: #try move left
 					print("trying to move left")
 					mv_x = 0
 					mv_y = -WIDTH+MARGIN
 					if chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == False:
 						if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
 							break
-				if seed == 2: #ry move down
+					else:
+						print("failstate")
+						failstate += 1
+						self.b_x = self.x
+						self.b_y = self.y
+						
+				elif seed == 2: #ry move down
 					print("trying to move down")
 					mv_x = -WIDTH+MARGIN
 					mv_y = 0
 					if chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == False:
 						if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
 							break
-				if seed == 3: #try move up
+					else:
+						print("failstate")
+						failstate += 1
+						self.b_x = self.x
+						self.b_y = self.y						
+				elif seed == 3: #try move up
 					print("trying to move down")
 					mv_x = WIDTH+MARGIN
 					mv_y = 0
 					if chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == False:
 						if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
 							break
-				else:
-					mv_x = 0
-					mv_y = 0
+					else:
+						print("failstate")
+						failstate += 1
+						self.b_x = self.x
+						self.b_y = self.y				
 					
 				
-			#error checking for 		
+			print(failstate)
 			safe_x,safe_y = chk_limit(self.x+mv_x,self.y+mv_y)
+			chk = xy2grid(safe_x,safe_y)
+			if grid[chk[0]][chk[1]] == 4:
+				print("ate item")
 			self.update_ai(safe_x,safe_y)
 			print(safe_x,safe_y)
+
 
 
 	
@@ -670,8 +722,8 @@ def gen_map(entrance,square):
 			x = row * (WIDTH + MARGIN)
 			y = column * (WIDTH + MARGIN)
 			seed = random.randint(1,(MATRIX * MATRIX))
-			if seed < (MATRIX * MATRIX) * 0.10:
-				print(str(seed), str((MATRIX * MATRIX) * 0.10))
+			if seed < (MATRIX * MATRIX) * RNG:
+				print(str(seed), str((MATRIX * MATRIX) * RNG))
 				if not grid[row][column] == 0:
 					#can't place here as door is here
 					try:
@@ -687,8 +739,9 @@ def gen_map(entrance,square):
 				p += 1
 				
 	#Generate the AI
-	ai_square_x = random.randint(LIMIT_UL,MATRIX) * WIDTH
-	ai_square_y = random.randint(LIMIT_UL,MATRIX) * WIDTH
+	print(str(LIMIT_UL),str(MATRIX * WIDTH))
+	ai_square_x = myround(random.randint(LIMIT_UL,(MATRIX * WIDTH)))
+	ai_square_y = myround(random.randint(LIMIT_UL,(MATRIX * WIDTH)))
 	c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
 						
 						
@@ -697,40 +750,43 @@ def pick_square_ai(x,y):
 
 	#Pick a new square based on current x,y cords
 	#It will either move one square up,down,left,right or stay in the same place
-	seed = random.randint(0,4)
-	target_x = c_h_pos.x
-	target_y = c_h_pos.y
-	
-	if seed == 0:
-		x -= (WIDTH + MARGIN)
+	state = False
+	while not state:
+		seed = random.randint(0,4)
 
-	if seed == 1:
-		y -= (WIDTH + MARGIN)
-	if seed == 2:
-		x = x
-		y = y
-	if seed == 3:
-		y += (WIDTH + MARGIN)
 
-	if seed == 4:
-		x += (WIDTH + MARGIN)
+		if seed == 0:
+			x -= (WIDTH + MARGIN)
 
-	x = myround(x)
-	y = myround(y)
-	#Don't allow the cords to be higher/lower than the border edges.
-	if x < LIMIT_UL:
-		x = LIMIT_UL + WIDTH
-		# print("Here 1:")
+		if seed == 1:
+			y -= (WIDTH + MARGIN)
+		if seed == 2:
+			x = x
+			y = y
+		if seed == 3:
+			y += (WIDTH + MARGIN)
 
-	if x > (LIMIT_DR - WIDTH):
-		x = LIMIT_DR - WIDTH
-		# print("Here 2:")
-	if y < LIMIT_UL:
-		y = LIMIT_UL + WIDTH
-		# print("Here 3:")
-	if y > (LIMIT_DR - WIDTH):
-		y = LIMIT_DR - WIDTH
-		# print("Here 4:")
+		if seed == 4:
+			x += (WIDTH + MARGIN)
+
+		x = myround(x)
+		y = myround(y)
+		#Don't allow the cords to be higher/lower than the border edges.
+		if x < LIMIT_UL:
+			x = LIMIT_UL + WIDTH
+			# print("Here 1:")
+
+		if x > (LIMIT_DR - WIDTH):
+			x = LIMIT_DR - WIDTH
+			# print("Here 2:")
+		if y < LIMIT_UL:
+			y = LIMIT_UL + WIDTH
+			# print("Here 3:")
+		if y > (LIMIT_DR - WIDTH):
+			y = LIMIT_DR - WIDTH
+			# print("Here 4:")
+		state = chk_blk_ocpy(0,x,y)
+		print(state)
 
 	return x,y
 
@@ -766,6 +822,11 @@ while not done:
 	if pressed[pygame.K_RIGHT]:
 		c_h_pos.move("right",c_h_pos.x,c_h_pos.y)
 	
+	if pressed[pygame.K_p]:
+		slower = not slower
+	if pressed[pygame.K_ESCAPE]:
+		done = True
+	
 
 	for event in pygame.event.get():  # User did something
 		if event.type == pygame.QUIT:  # If user clicked close
@@ -781,10 +842,11 @@ while not done:
 	
 
 	c_ai_pos.find_player_ai(c_h_pos.x,c_h_pos.y)
-	print(c_ai_pos.row,c_ai_pos.col)
-	grid[c_ai_pos.row][c_ai_pos.col] = 2
+	#print(c_ai_pos.row,c_ai_pos.col)
+	
+	# if not c_ai_pos.row == c_ai_pos.l_row and c_ai_pos.col == c_ai_pos.l_col:
 	grid[c_ai_pos.l_row][c_ai_pos.l_col] = 0	
-
+	grid[c_ai_pos.row][c_ai_pos.col] = 2
 	#Set up debug window strings
 	
 	#Player directions
@@ -792,7 +854,7 @@ while not done:
 	string_to_print = c_h_pos.direction + "," + str(c_h_pos.l_row) + ":" + str(c_h_pos.l_col)
 	h_text = font.render(string_to_print, True, (255, 255, 255))
 	#AI INFO
-	ai_string = "Type " + ": " + c_ai_pos.type + ", HP : " + str(c_ai_pos.hp)
+	ai_string = "Type " + ": " + c_ai_pos.type + ", HP : " + str(c_ai_pos.row) + " : "+ str(c_ai_pos.col)
 	ai_text = font.render(ai_string, True, (255, 255, 255))
 
 
@@ -832,7 +894,9 @@ while not done:
 
 	# Limit to FPS var
 	clock.tick(FPS)
-	#pygame.time.delay(300)
+	if slower == True:
+	
+		pygame.time.delay(300)
 
 
 	# Go ahead and update the screen with what we've drawn.
