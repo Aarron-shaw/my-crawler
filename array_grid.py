@@ -56,8 +56,8 @@ MARGIN = 0
 MATRIX = 25
 
 # This sets the WIDTH and HEIGHT of each grid location
-WIDTH = WINDOW_SIZE[0] // MATRIX
-HEIGHT = WINDOW_SIZE[0] // MATRIX
+WIDTH = WINDOW_SIZE[0] // (MATRIX + MARGIN)
+HEIGHT = WINDOW_SIZE[0] // (MATRIX + MARGIN)
 #FPS
 FPS = 10
 # Create a 2 dimensional array. A two dimensional
@@ -74,7 +74,7 @@ for row in range(MATRIX):
 
 enemy_list = ["Goblin","Rats","Giant rat","Snail","zombie","Vampire","Ghost","witch","Org","Orc","Special"]
 
-object_list = ["Gold","Silver","Trash","wood","Iron","Leather","cloth","Potion","Meal","Water","Special"]
+object_list = ["gold","silver","trash","wood","iron","leather","cloth","potion","meal","water","special"]
 
 #Set a bunch of default values
 
@@ -108,10 +108,24 @@ def x2grid(x):
 def chk_blk_ocpy(block_type,x,y):
 	row = x2grid(x) 
 	col = x2grid(y)
-	if not grid[row][col] == 0:
+	if row > MATRIX-1: return False
+	if col > MATRIX-1: return False
+	if not grid[row][col] == 0 or grid[row][col] == block_type:
 		return True
 	else:
 		return False
+		
+def chk_blk_border(x,y):
+	if x > LIMIT_DR:
+		return False
+	if y > LIMIT_DR:
+		return False
+	if x < LIMIT_UL:
+		return False
+	if y < LIMIT_UL:
+		return False
+	else:
+		return True
 		
 def chk_side(x,y):
 	row = x2grid(x)
@@ -136,7 +150,18 @@ def chk_row(q,x,y):
 		return col
 	if q == 4:
 		return row
-	
+
+def chk_limit(x,y):
+	if x >= LIMIT_DR:
+		x = LIMIT_DR-WIDTH+MARGIN
+	if x < LIMIT_UL:
+		x = LIMIT_UL
+	if y >= LIMIT_DR:
+		y = LIMIT_DR-WIDTH+MARGIN
+	if y < LIMIT_UL:
+		y = LIMIT_UL
+	return x,y
+
 		
 #Classes
 
@@ -151,47 +176,7 @@ class Item(object):
 		
 		
 	
-# class ObjProjectile(object):
-	# def __init__(self,x,y,direction):
-		# self.x = x
-		# self.y = y
-		# self.row = self.x // ((WIDTH + MARGIN))
-		# self.col = self.y // ((WIDTH + MARGIN))
-		# self.direction = direction
-
 	
-	# def check_collision(self,x,y,direction):
-	# #check for collision boarder.
-		# self.direction = direction
-		# if direction == "up":
-			# if not (x-WIDTH) <= LIMIT_UL:
-				# self.x = (x-WIDTH)
-				# self.row = self.x // ((WIDTH + MARGIN))
-				# print(self.x,self.y,self.row,self.col,self.direction)
-				# grid[self.row][self.col] = 3
-				
-		# if direction == "down":
-			# if not (self.x+WIDTH) >= LIMIT_DR:
-				# self.x = (x+WIDTH)
-				# self.row = self.x // ((WIDTH + MARGIN))
-				# print(self.x,self.y,self.row,self.col,self.direction,LIMIT_DR)
-				# grid[self.row][self.col] = 3
-				
-		# if direction == "left":
-			# if not (y-WIDTH) <= LIMIT_UL:
-				# self.y = (y-WIDTH)
-				# self.col = self.y // ((WIDTH + MARGIN))
-				# print(self.x,self.y,self.row,self.col,self.direction)
-				# grid[self.row][self.col] = 3
-				
-		# if direction == "right":
-			# if not (y+WIDTH) >= LIMIT_DR:
-				# self.y = (y+WIDTH)
-				# self.col = self.y // ((WIDTH + MARGIN))
-				# print(self.x,self.y,self.row,self.col,self.direction)
-				# grid[self.row][self.col] = 3
-		# return FPS * 0.3
-		
 		
 
 class ObjHuman(object):
@@ -207,7 +192,21 @@ class ObjHuman(object):
 		self.l_row = self.l_x // ((WIDTH + MARGIN))
 		self.l_col = self.l_y // ((WIDTH + MARGIN))
 		self.direction = direction
+		
+		
+		#Player stats
 		self.hp = 100
+		self.gold = 0
+		self.silver = 0
+		self.trash = 0
+		self.wood = 0
+		self.iron = 0
+		self.leather = 0
+		self.cloth = 0
+		self.potion = 0
+		self.meal = 0
+		self.water = 0
+		self.special = 0
 		
 		#projectiles
 		self.p_x = x
@@ -217,8 +216,9 @@ class ObjHuman(object):
 		self.p_direction = direction
 		
 	def debug_self(self):
-		print("x:{},y:{},p_x:{},p_y:{}".format(self.x,self.y,self.p_x,self.p_y))
-
+		# print("x:{},y:{},p_x:{},p_y:{}".format(self.x,self.y,self.p_x,self.p_y))
+		# print("p_row:{},p_col:{}".format(self.p_row,self.p_col))
+		print(self.p_x,self.p_y)
 	def move(self,direction,x,y):
 
 		q = 1
@@ -228,7 +228,7 @@ class ObjHuman(object):
 			#if our height is greater than the limit we can move
 			#defailt is 0
 			if self.x > LIMIT_UL:
-				self.x -= WIDTH
+				self.x -= (WIDTH + MARGIN)
 				self.col = self.y // (WIDTH + MARGIN)
 				self.row = self.x // (HEIGHT + MARGIN)
 				#== 2 is AI occupied return to our position
@@ -266,7 +266,7 @@ class ObjHuman(object):
 							print(self.x,self.y,self.row,self.col)
 					#We can't occupy the grid, move back. 
 					else:
-						self.x += WIDTH
+						self.x += (WIDTH + MARGIN)
 						self.col = self.y // (WIDTH + MARGIN)
 						self.row = self.x // (HEIGHT + MARGIN)
 				#0 is free, so we can occupy it.
@@ -284,7 +284,7 @@ class ObjHuman(object):
 		if direction == "down":
 
 			if self.x < (LIMIT_DR - HEIGHT):
-				self.x += WIDTH
+				self.x += (WIDTH + MARGIN)
 				self.col = self.y // (WIDTH + MARGIN)
 				self.row = self.x // (HEIGHT + MARGIN)
 				if not grid[self.row][self.col] == 0:
@@ -315,7 +315,7 @@ class ObjHuman(object):
 							self.row = self.x // (HEIGHT + MARGIN)
 							print(self.x,self.y,self.row,self.col)						
 					else:
-						self.x -= WIDTH
+						self.x -= (WIDTH + MARGIN)
 						self.col = self.y // (WIDTH + MARGIN)
 						self.row = self.x // (HEIGHT + MARGIN)
 				if grid[self.row][self.col] == 0:
@@ -330,7 +330,7 @@ class ObjHuman(object):
 
 		if direction == "left":
 			if self.y > LIMIT_UL:
-				self.y -= WIDTH
+				self.y -= (WIDTH + MARGIN)
 				self.col = self.y // (WIDTH + MARGIN)
 				self.row = self.x // (HEIGHT + MARGIN)
 				if not grid[self.row][self.col] == 0:
@@ -361,7 +361,7 @@ class ObjHuman(object):
 							self.row = self.x // (HEIGHT + MARGIN)
 							print(self.x,self.y,self.row,self.col)
 					else:
-						self.y += WIDTH
+						self.y += (WIDTH + MARGIN)
 						self.col = self.y // (WIDTH + MARGIN)
 						self.row = self.x // (HEIGHT + MARGIN)
 				if grid[self.row][self.col] == 0:
@@ -378,7 +378,7 @@ class ObjHuman(object):
 		if direction == "right":
 
 			if self.y < (LIMIT_DR - WIDTH):
-				self.y += WIDTH
+				self.y += (WIDTH + MARGIN)
 				self.col = self.y // (WIDTH + MARGIN)
 				self.row = self.x // (HEIGHT + MARGIN)
 				if not grid[self.row][self.col] == 0:
@@ -409,7 +409,7 @@ class ObjHuman(object):
 							self.row = self.x // (HEIGHT + MARGIN)
 							print(self.x,self.y,self.row,self.col)
 					else:
-						self.y -= WIDTH
+						self.y -= (WIDTH + MARGIN)
 						self.col = self.y // (WIDTH + MARGIN)
 						self.row = self.x // (HEIGHT + MARGIN)
 				if grid[self.row][self.col] == 0:
@@ -440,27 +440,55 @@ class ObjHuman(object):
 				
 		if direction == "down":
 			if not (x+WIDTH) >= LIMIT_DR:
-				self.p_x = (x+WIDTH)
+				self.p_x = (x+WIDTH+MARGIN)
 				self.p_row = self.p_x // ((WIDTH + MARGIN))
 				print(self.p_x,self.p_y,self.p_row,self.p_col,self.p_direction,LIMIT_DR)
 				grid[self.p_row][self.p_col] = 3
 				
 		if direction == "left":
-			if not (y-WIDTH) <= LIMIT_UL:
+			if not (y-WIDTH) < LIMIT_UL:
 				self.p_y = (y-WIDTH)
 				self.p_col = self.p_y // ((WIDTH + MARGIN))
 				print(self.p_x,self.p_y,self.p_row,self.p_col,self.direction)
 				grid[self.p_row][self.p_col] = 3
 				
 		if direction == "right":
-			if not (y+WIDTH) >= LIMIT_DR:
-				self.p_y = (y+WIDTH)
+			if not (y+WIDTH) > LIMIT_DR:
+				self.p_y = (y+WIDTH+MARGIN)
 				self.p_col = self.p_y // ((WIDTH + MARGIN))
 				print(self.p_x,self.p_y,self.p_row,self.p_col,self.direction)
 				grid[self.p_row][self.p_col] = 3
 		if DEBUG == 3: self.debug_self()
+		self.debug_self()
 		
+		for n,i in enumerate(item):
+			#print(i.__dict__)
+			
+			if i.row == self.p_row and i.col == self.p_col:
 
+				if i.name == "gold":
+					self.gold += i.amount
+				if i.name == "silver":
+					self.silver += i.amount	
+				if i.name == "trash":
+					self.trash += i.amount
+				if i.name == "wood":
+					self.wood += i.amount
+				if i.name == "iron":
+					self.iron += i.amount
+				if i.name == "leather":
+					self.leather += i.amount
+				if i.name == "cloth":
+					self.cloth += i.amount
+				if i.name == "potion":
+					self.potion += i.amount
+				if i.name == "meal":
+					self.meal += i.amount
+				if i.name == "water":
+					self.water += i.amount
+				if i.name == "special":
+					self.special += i.amount
+				del item[n]
 		return FPS * 0.3
 
 
@@ -491,6 +519,87 @@ class ObjPos(object):
 		self.col = self.y // ((WIDTH + MARGIN))
 		self.l_row = self.l_x // ((WIDTH + MARGIN))
 		self.l_col = self.l_y // ((WIDTH + MARGIN))
+		
+	def find_player_ai(self,h_x,h_y):
+		#given the players cords, move on step closer. 
+		t_x = self.x - h_x 
+		t_y = self.y - h_y
+		print(t_x,t_y)
+		
+		if t_x > 0 and t_y >= 0:
+			print("up")
+			mv_x = -WIDTH+MARGIN
+			mv_y = 0
+			
+			
+			
+		elif t_x >= 0 and t_y < 0:
+			print("right")
+			mv_x = 0
+			mv_y = WIDTH+MARGIN
+			
+			
+		elif t_x < 0 and t_y <= 0:
+			print("down")
+			mv_x = WIDTH+MARGIN
+			mv_y = 0
+			
+			
+		elif t_x <= 0 and t_y > 0:
+			print("left")
+			mv_x = 0
+			mv_y = -WIDTH+MARGIN
+			
+		elif t_x == 0 and t_y == 0:
+			mv_x = 0
+			mv_y = 0
+			
+		#This section checks if the target is at the boarder, 
+		#if returns True, it's ok to proceed. 
+		if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
+		
+			#Check if our target is occupied. 
+			#False is occupied 
+
+			while chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == True:
+				seed = random.randint(0,3)
+				if seed == 0: #Try move right
+					print("trying to move right")
+					mv_x = 0
+					mv_y = WIDTH+MARGIN
+					if chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == False:
+						if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
+							break
+				if seed == 1: #try move left
+					print("trying to move left")
+					mv_x = 0
+					mv_y = -WIDTH+MARGIN
+					if chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == False:
+						if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
+							break
+				if seed == 2: #ry move down
+					print("trying to move down")
+					mv_x = -WIDTH+MARGIN
+					mv_y = 0
+					if chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == False:
+						if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
+							break
+				if seed == 3: #try move up
+					print("trying to move down")
+					mv_x = WIDTH+MARGIN
+					mv_y = 0
+					if chk_blk_ocpy(2,self.x+mv_x,self.y+mv_y) == False:
+						if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
+							break
+				else:
+					mv_x = 0
+					mv_y = 0
+					
+				
+			#error checking for 		
+			safe_x,safe_y = chk_limit(self.x+mv_x,self.y+mv_y)
+			self.update_ai(safe_x,safe_y)
+			print(safe_x,safe_y)
 
 
 	
@@ -514,12 +623,12 @@ def clean_map():
 			if not grid[row][column] == 1:
 				grid[row][column] = 0
 	del c_ai_pos
-	ai_square_x = random.randint(LIMIT_UL,LIMIT_DR)
-	ai_square_y = random.randint(LIMIT_UL,LIMIT_DR)
-	c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
+
 	 
 
 def gen_map(entrance,square):
+	global item
+	global c_ai_pos
 	#first step is to generate doors at the edge of the map
 	#Creates a set of exits for the room
 	exits = [entrance_to_exit(entrance)]
@@ -558,11 +667,11 @@ def gen_map(entrance,square):
 	item = []
 	for row in range(MATRIX):
 		for column in range(MATRIX):
-			x = row * (WIDTH - MARGIN)
-			y = column * (WIDTH - MARGIN)
+			x = row * (WIDTH + MARGIN)
+			y = column * (WIDTH + MARGIN)
 			seed = random.randint(1,(MATRIX * MATRIX))
-			if seed < (MATRIX * MATRIX) * 0.01:
-				print(str(seed), str((MATRIX * MATRIX) * 0.01))
+			if seed < (MATRIX * MATRIX) * 0.10:
+				print(str(seed), str((MATRIX * MATRIX) * 0.10))
 				if not grid[row][column] == 0:
 					#can't place here as door is here
 					try:
@@ -577,6 +686,10 @@ def gen_map(entrance,square):
 					print(item[p].__dict__)
 				p += 1
 				
+	#Generate the AI
+	ai_square_x = random.randint(LIMIT_UL,MATRIX) * WIDTH
+	ai_square_y = random.randint(LIMIT_UL,MATRIX) * WIDTH
+	c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
 						
 						
 #AI functions
@@ -589,18 +702,18 @@ def pick_square_ai(x,y):
 	target_y = c_h_pos.y
 	
 	if seed == 0:
-		x -= WIDTH
+		x -= (WIDTH + MARGIN)
 
 	if seed == 1:
-		y -= WIDTH
+		y -= (WIDTH + MARGIN)
 	if seed == 2:
 		x = x
 		y = y
 	if seed == 3:
-		y += WIDTH
+		y += (WIDTH + MARGIN)
 
 	if seed == 4:
-		x += WIDTH
+		x += (WIDTH + MARGIN)
 
 	x = myround(x)
 	y = myround(y)
@@ -624,9 +737,9 @@ def pick_square_ai(x,y):
 #Initialise our player and ai object. 
 
 
-ai_square_x = random.randint(LIMIT_UL,LIMIT_DR)
-ai_square_y = random.randint(LIMIT_UL,LIMIT_DR)
-c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
+# ai_square_x = random.randint(LIMIT_UL,LIMIT_DR)
+# ai_square_y = random.randint(LIMIT_UL,LIMIT_DR)
+# c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
 
 c_h_pos = ObjHuman(0,0,0,0,"left")
 grid[c_h_pos.row][c_h_pos.col] = 1
@@ -636,7 +749,8 @@ gen_map(1,random.randint(0,MATRIX-1))
 # -------- Main Program Loop -----------
 while not done:
 	pressed = pygame.key.get_pressed()
-
+	if pressed[pygame.MOUSEBUTTONUP]:
+		None 
 
 	if pressed[pygame.K_UP]:
 		c_h_pos.move("up",c_h_pos.x,c_h_pos.y)
@@ -651,8 +765,7 @@ while not done:
 
 	if pressed[pygame.K_RIGHT]:
 		c_h_pos.move("right",c_h_pos.x,c_h_pos.y)
-
-
+	
 
 	for event in pygame.event.get():  # User did something
 		if event.type == pygame.QUIT:  # If user clicked close
@@ -662,17 +775,15 @@ while not done:
 		if pressed[pygame.K_SPACE]:
 			#proj = ObjProjectile(c_h_pos.x,c_h_pos.y,c_h_pos.direction)
 			c_h_pos.check_collision(c_h_pos.x,c_h_pos.y,c_h_pos.direction)
+		else:
+			pass
 	if DEBUG == 3: print(c_ai_pos.__dict__)
 	
-	tmp_ai = pick_square_ai(c_ai_pos.x,c_ai_pos.y)
-	#print("grid : ", str(x2grid(tmp_ai[0])), " ", str(x2grid(tmp_ai[1])))
-	#print(tmp_ai)
-	if grid[x2grid(tmp_ai[0])][x2grid(tmp_ai[1])] == 0:
-		c_ai_pos.update_ai(tmp_ai[0],tmp_ai[1])
-		grid[c_ai_pos.row][c_ai_pos.col] = 2
-		grid[c_ai_pos.l_row][c_ai_pos.l_col] = 0
-	if grid[x2grid(tmp_ai[0])][x2grid(tmp_ai[1])] == 1:
-		print("OCCUPIED!")
+
+	c_ai_pos.find_player_ai(c_h_pos.x,c_h_pos.y)
+	print(c_ai_pos.row,c_ai_pos.col)
+	grid[c_ai_pos.row][c_ai_pos.col] = 2
+	grid[c_ai_pos.l_row][c_ai_pos.l_col] = 0	
 
 	#Set up debug window strings
 	
@@ -701,11 +812,11 @@ while not done:
 			if grid[row][column] == 3:
 				if timer%2 == 0:
 					color = PASTLE_BLUE
-					if DEBUG == 2: print("white")
+					
 				else:
 					color = BLACK
 					print(timer%2)
-					if DEBUG == 2: print("black")
+
 				if timer == 0:
 					grid[row][column] = 0
 			if grid[row][column] == 4:
@@ -721,6 +832,7 @@ while not done:
 
 	# Limit to FPS var
 	clock.tick(FPS)
+	#pygame.time.delay(300)
 
 
 	# Go ahead and update the screen with what we've drawn.
