@@ -29,7 +29,7 @@ GREY = (128,128,128)
 PINK = (255,105,180)
 
 slower = False
-RNG = 0.05
+RNG = 0.15
 # GRID DEFS
 # 0 = empty
 # 1 = player
@@ -503,6 +503,7 @@ class ObjPos(object):
 		self.l_y = l_y
 		self.b_x = 0
 		self.b_y = 0
+		self.direction = 0
 		self.row = self.x // ((WIDTH + MARGIN))
 		self.col = self.y // ((WIDTH + MARGIN))
 		self.l_row = self.l_x // ((WIDTH + MARGIN))
@@ -530,14 +531,13 @@ class ObjPos(object):
 		t_x = self.x - h_x 
 		t_y = self.y - h_y
 		failstate = 0
+		mv_x = 0
+		mv_y = 0
 		#print(t_x,t_y)
 		if self.l_x == self.b_x and self.l_y == self.b_y:
 			print("switching?")
 			seed = random.randint(0,4)
 			
-			mv_x = 0
-			mv_y = 0
-
 			if seed == 0:
 				mv_x -= (WIDTH + MARGIN)
 
@@ -556,34 +556,34 @@ class ObjPos(object):
 		
 		else:
 			
-			if t_x > 0 and t_y >= 0:
+			if t_x > 0 and t_y >= 0 and not self.direction == 3:
 				print("up")
 				mv_x = -WIDTH+MARGIN
 				mv_y = 0
+				self.direction = 1
 				
 				
-				
-			elif t_x >= 0 and t_y < 0:
+			elif t_x >= 0 and t_y < 0 and not self.direction == 4:
 				print("right")
 				mv_x = 0
 				mv_y = WIDTH+MARGIN
+				self.direction = 2
 				
-				
-			elif t_x < 0 and t_y <= 0:
+			elif t_x < 0 and t_y <= 0 and not self.direction == 1:
 				print("down")
 				mv_x = WIDTH+MARGIN
 				mv_y = 0
+				self.direction = 3
 				
-				
-			elif t_x <= 0 and t_y > 0:
+			elif t_x <= 0 and t_y > 0 and not self.direction == 2:
 				print("left")
 				mv_x = 0
 				mv_y = -WIDTH+MARGIN
-				
+				self.direction = 4
 			elif t_x == 0 and t_y == 0:
 				mv_x = 0
 				mv_y = 0
-			
+				self.direction = 0
 		#This section checks if the target is at the boarder, 
 		#if returns True, it's ok to proceed. 
 		if chk_blk_border(self.x+mv_x,self.y+mv_y) == True:
@@ -728,7 +728,7 @@ def gen_map(entrance,square):
 					#can't place here as door is here
 					try:
 						if grid[row-1][column-1] == 0:
-							item[p] = Item(x,y)
+							item.append(Item(x,y))
 							grid[row-1][column-1] = 4
 					except:
 						print("Error")
@@ -842,7 +842,7 @@ while not done:
 	
 
 	c_ai_pos.find_player_ai(c_h_pos.x,c_h_pos.y)
-	#print(c_ai_pos.row,c_ai_pos.col)
+	print(c_ai_pos.row,c_ai_pos.col,"last: ",c_ai_pos.l_row,c_ai_pos.l_col)
 	
 	# if not c_ai_pos.row == c_ai_pos.l_row and c_ai_pos.col == c_ai_pos.l_col:
 	grid[c_ai_pos.l_row][c_ai_pos.l_col] = 0	
