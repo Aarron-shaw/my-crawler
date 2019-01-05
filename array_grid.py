@@ -735,14 +735,17 @@ def gen_map(entrance,square):
 				else:
 					grid[row][column] = 4
 					item.append(Item(x,y))
-					print(item[p].__dict__)
+					#print(item[p].__dict__)
 				p += 1
 				
 	#Generate the AI
+	c_ai_pos = []
 	print(str(LIMIT_UL),str(MATRIX * WIDTH))
-	ai_square_x = myround(random.randint(LIMIT_UL,(MATRIX * WIDTH)))
-	ai_square_y = myround(random.randint(LIMIT_UL,(MATRIX * WIDTH)))
-	c_ai_pos = ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y)
+	for i in range(0,random.randint(1,5)):
+		print(i)
+		ai_square_x = myround(random.randint(LIMIT_UL,(MATRIX * WIDTH)))
+		ai_square_y = myround(random.randint(LIMIT_UL,(MATRIX * WIDTH)))
+		c_ai_pos.append(ObjPos(ai_square_x,ai_square_y,ai_square_x,ai_square_y))
 						
 						
 #AI functions
@@ -840,13 +843,13 @@ while not done:
 			pass
 	if DEBUG == 3: print(c_ai_pos.__dict__)
 	
-
-	c_ai_pos.find_player_ai(c_h_pos.x,c_h_pos.y)
-	print(c_ai_pos.row,c_ai_pos.col,"last: ",c_ai_pos.l_row,c_ai_pos.l_col)
+	for v,t in enumerate(c_ai_pos):
+		c_ai_pos[v].find_player_ai(c_h_pos.x,c_h_pos.y)
+		print(c_ai_pos[v].row,c_ai_pos[v].col,"last: ",c_ai_pos[v].l_row,c_ai_pos[v].l_col)
 	
 	# if not c_ai_pos.row == c_ai_pos.l_row and c_ai_pos.col == c_ai_pos.l_col:
-	grid[c_ai_pos.l_row][c_ai_pos.l_col] = 0	
-	grid[c_ai_pos.row][c_ai_pos.col] = 2
+		grid[c_ai_pos[v].l_row][c_ai_pos[v].l_col] = 0	
+		grid[c_ai_pos[v].row][c_ai_pos[v].col] = 2
 	#Set up debug window strings
 	
 	#Player directions
@@ -854,8 +857,8 @@ while not done:
 	string_to_print = c_h_pos.direction + "," + str(c_h_pos.l_row) + ":" + str(c_h_pos.l_col)
 	h_text = font.render(string_to_print, True, (255, 255, 255))
 	#AI INFO
-	ai_string = "Type " + ": " + c_ai_pos.type + ", HP : " + str(c_ai_pos.row) + " : "+ str(c_ai_pos.col)
-	ai_text = font.render(ai_string, True, (255, 255, 255))
+	#ai_string = "Type " + ": " + c_ai_pos.type + ", HP : " + str(c_ai_pos.row) + " : "+ str(c_ai_pos.col)
+	#ai_text = font.render(ai_string, True, (255, 255, 255))
 
 
 
@@ -890,7 +893,7 @@ while not done:
 			#pygame.time.wait(10)
 			pygame.draw.rect(screen,color,[(MARGIN + WIDTH) * column + MARGIN,(MARGIN + HEIGHT) * row + MARGIN, WIDTH,HEIGHT])
 	screen.blit(h_text,(0, 510 - h_text.get_height() // 2))
-	screen.blit(ai_text,( 0, 530 - ai_text.get_height() // 2))
+	#screen.blit(ai_text,( 0, 530 - ai_text.get_height() // 2))
 
 	# Limit to FPS var
 	clock.tick(FPS)
